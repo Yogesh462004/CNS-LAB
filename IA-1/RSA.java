@@ -1,7 +1,7 @@
 package com.yp.arrays;
 import java.math.BigInteger;
 import java.util.*;
-public class RSA {
+public class Example02{
 
 
     public static void main(String[] args) {
@@ -42,8 +42,9 @@ public class RSA {
             StringBuilder sb=new StringBuilder();
             System.out.println("\nEncrypted Message:");
             for(int i=0;i<input.length();i++){
-                 cipher[i]=numericText[i].modPow(e,n);
+                cipher[i]=numericText[i].modPow(e,n);
                 System.out.print(cipher[i].intValue()+" ");
+                sb.append((char)(cipher[i].intValue()+'A'));
             }
 
             System.out.println();
@@ -53,9 +54,10 @@ public class RSA {
             StringBuilder sb1=new StringBuilder();
             for(int i=0;i<input.length();i++){
                 decrypt[i]=cipher[i].modPow(d,n);
+                System.out.print(decrypt[i].intValue()+" ");
                 sb1.append((char)(decrypt[i].intValue()+'A'));
             }
-            System.out.println(sb1);
+            System.out.println("\n"+sb1);
         }
 
 
