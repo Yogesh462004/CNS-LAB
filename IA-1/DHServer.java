@@ -1,58 +1,64 @@
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.util.Scanner;
+
+import java.net.*;
+import java.io.*;
+import java.util.*;
 
 public class DHServer {
-
-    static long power(long base, long exp, long mod) {
-        long result = 1;
-        base = base % mod;
-        while (exp > 0) {
-            if (exp % 2 == 1)
-                result = (result * base) % mod;
-            exp = exp / 2;
-            base = (base * base) % mod;
-        }
-        return result;
-    }
 
     public static void main(String[] args) throws Exception {
 
         Scanner sc = new Scanner(System.in);
+        long p, g, x, ya, yb, ka;
 
-        System.out.print("Enter prime number (p): ");
-        long p = sc.nextLong();
+        System.out.print("Enter Prime number (p): ");
+        p = sc.nextLong();
 
-        System.out.print("Enter primitive root (g): ");
-        long g = sc.nextLong();
+        System.out.print("Enter Primitive root (g): ");
+        g = sc.nextLong();
 
-        System.out.print("Enter private key of Server (xa): ");
-        long xa = sc.nextLong();
+        System.out.print("Enter Private Key (x): ");
+        x = sc.nextLong();
 
-        long ya = power(g, xa, p);
+        // Server public key
+        ya = modPow(g, x, p);
 
         ServerSocket ss = new ServerSocket(5000);
-        System.out.println("Server waiting for client...");
+        System.out.println("\nServer waiting for client...");
         Socket s = ss.accept();
 
-        DataInputStream in = new DataInputStream(s.getInputStream());
         DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataInputStream in = new DataInputStream(s.getInputStream());
 
+        // Send p, g and public key to client
         out.writeLong(p);
         out.writeLong(g);
         out.writeLong(ya);
 
-        long yb = in.readLong();
+        // Receive client's public key
+        yb = in.readLong();
 
-        long ka = power(yb, xa, p);
+        // Compute shared key
+        ka = modPow(yb, x, p);
 
-        System.out.println("Public key received from Client (yb): " + yb);
-        System.out.println("Shared Secret Key (Server): " + ka);
+        System.out.println("Public key received from client: " + yb);
+        System.out.println("Shared secret key: " + ka);
 
         s.close();
         ss.close();
         sc.close();
+    }
+
+    private static long modPow(long base, long exp, long mod) {
+        long result = 1;
+        base = base % mod;
+
+        while (exp > 0) {
+            if (exp % 2 == 1)
+                result = (result * base) % mod;
+
+            exp = exp / 2;
+            base = (base * base) % mod;
+        }
+        return result;
     }
 }
